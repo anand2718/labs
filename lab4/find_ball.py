@@ -22,11 +22,19 @@ def find_ball(opencv_image, debug=False):
 		
 		Returns [x, y, radius] of the ball, and [0,0,0] or None if no ball is found.
 	"""
+	# Anand's code here: 
 
 	ball = None
-	
-	## TODO: INSERT YOUR SOLUTION HERE
-	
+
+	img = cv2.medianBlur(opencv_image, 5)
+	circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,1,20,
+                            param1=50,param2=30,minRadius=0,maxRadius=0)
+
+	if not (circles is None):
+		ball = circles[0][0]
+		if debug: 
+			display_circles(opencv_image, circles[0], ball)
+
 	return ball
 
 

@@ -25,7 +25,7 @@ for filedata in grid_data:
 	opencv_image = cv2.imread("./imgs/" + file, cv2.COLOR_GRAY2RGB)
 	 
 	#try to find the ball in the image
-	ball = find_ball.find_ball(opencv_image)
+	ball = find_ball.find_ball(opencv_image, False)
 	print(file, ball)
 	
 	if ball is None:
@@ -43,4 +43,4 @@ for filedata in grid_data:
 	if center_err <= center_err_thresh and r_err <= radius_err_thresh:
 		score += 1;
  
-print("score =", score)
+print("score =", score/len(grid_data))
