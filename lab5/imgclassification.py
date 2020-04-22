@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
 ##############
-#### Your name:
+#### Your name: Anand Sekar
 ##############
 
 import numpy as np
 import re
 from sklearn import svm, metrics
-from skimage import io, feature, filters, exposure, color
+from skimage import data, io, feature, filters, exposure, color
+from skimage.feature import hog
 
 class ImageClassifier:
     
     def __init__(self):
-        self.classifer = None
+        self.classifier = None
 
     def imread_convert(self, f):
         return io.imread(f).astype(np.uint8)
@@ -40,7 +41,14 @@ class ImageClassifier:
         ########################
         ######## YOUR CODE HERE
         ########################
-        
+        feature_data = np.empty([len(data), 2400])
+        image_indices = np.arange(len(data))
+        for image, index in zip(data, image_indices):
+            fd = hog(image, orientations=8, pixels_per_cell=(16, 16),
+                    cells_per_block=(1, 1), visualize=False, multichannel=True)
+            feature_data[index] = fd
+        # NOTE: the hog parameters may need to be adjusted
+
         # Please do not modify the return type below
         return(feature_data)
 
@@ -52,7 +60,10 @@ class ImageClassifier:
         ########################
         ######## YOUR CODE HERE
         ########################
-
+        # feature_data is 196 * 2400, 196 labels
+        self.classifier = svm.SVC(kernel = 'linear', C = 1).fit(train_data, train_labels)
+        return None
+        
     def predict_labels(self, data):
         # Please do not modify the header
 
@@ -62,7 +73,8 @@ class ImageClassifier:
         ########################
         ######## YOUR CODE HERE
         ########################
-        
+        predicted_labels = self.classifier.predict(data)
+
         # Please do not modify the return type below
         return predicted_labels
 
