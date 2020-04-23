@@ -10,6 +10,8 @@ sys.path.insert(0, '../lab4')
 import find_ball
 
 import cozmo
+from cozmo.util import degrees, distance_mm, speed_mmps
+
 
 try:
     from PIL import ImageDraw, ImageFont
@@ -56,9 +58,12 @@ async def run(robot: cozmo.robot.Robot):
     #add annotators for battery level and ball bounding box
     robot.world.image_annotator.add_annotator('battery', BatteryAnnotator)
     robot.world.image_annotator.add_annotator('ball', BallAnnotator)
-
+    # Move lift down and tilt the head up
+    await robot.set_head_angle(degrees(10)).wait_for_completed()
+    robot.move_lift(-3)
 
     try:
+    
 
         while True:
             #get camera image
@@ -74,7 +79,21 @@ async def run(robot: cozmo.robot.Robot):
             BallAnnotator.ball = ball
 
             ## TODO: ENTER YOUR SOLUTION HERE
+            # # for debugging
+            # if not (ball is None):
+            #     print("X: " + str(ball[0]) + ", Y: " + str(ball[1]) + ", Radius: " + str(ball[2]))
 
+            if (ball is None): #search
+                await robot.turn_in_place(degrees(45)).wait_for_completed()
+            elif (ball[2] < 100): # move-to
+                if(ball[0] < 100): 
+                    await robot.turn_in_place(degrees(10)).wait_for_completed()
+                elif(ball[0] > 200): 
+                    await robot.turn_in_place(degrees(-20)).wait_for_completed()
+                else: 
+                    await robot.drive_straight(distance_mm(50), speed_mmps(100)).wait_for_completed()
+            else: # hit
+                await robot.play_anim_trigger(cozmo.anim.Triggers.PouncePounce).wait_for_completed()
 
     except KeyboardInterrupt:
         print("")
