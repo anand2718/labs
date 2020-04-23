@@ -54,6 +54,10 @@ async def run(robot: cozmo.robot.Robot):
             print("Predicc: ")
             print(predicted_labels)
 
+            # say/ act on label
+            # NOTE: one could increase num_images, and create an outer loop in
+            # order to make sure X number of labels is consistent, but I found
+            # this simpler version to work better 
             for x in range(num_images):
                 if (predicted_labels[x] == "plane"):
                     await robot.say_text("plane", voice_pitch=-1.0, duration_scalar=0.5).wait_for_completed()
