@@ -14,12 +14,8 @@ import time
 import sys
 
 def get_relative_pose(object_pose, reference_frame_pose):
-	# ####
-	# TODO: Implement computation of the relative frame using numpy.
-	# Try to derive the equations yourself and verify by looking at
-	# the books or slides before implementing.
-	# ####
-	return None
+	# TODO: negate reference pose due to SDK bug 
+	return reference_frame_pose.define_pose_relative_this(object_pose)
 
 def find_relative_cube_pose(robot: cozmo.robot.Robot):
 	'''Looks for a cube while sitting still, prints the pose of the detected cube
@@ -51,11 +47,13 @@ def move_relative_to_cube(robot: cozmo.robot.Robot):
 		try:
 			cube = robot.world.wait_for_observed_light_cube(timeout=30)
 			if cube:
+				cube_pose = cube.pose
+				robot_pose = robot.pose
 				print("Found a cube, pose in the robot coordinate frame: %s" % get_relative_pose(cube.pose, robot.pose))
 		except asyncio.TimeoutError:
 			print("Didn't find a cube")
 
-	desired_pose_relative_to_cube = Pose(0, 100, 0, angle_z=degrees(90))
+	# Pose(0, 100, 0, angle_z=degrees(90))
 
 	# ####
 	# TODO: Make the robot move to the given desired_pose_relative_to_cube,
@@ -66,6 +64,17 @@ def move_relative_to_cube(robot: cozmo.robot.Robot):
 	# desired relative pose, it should perform an action on the cube using its
 	# forklift and/or base movement.
 	# ####
+
+	desired_pose_relative_to_cube = get_relative_pose(cube_pose, robot_pose)
+	cozmo_go_to_pose(robot, desired_pose_relative_to_cube.position.x, 
+		desired_pose_relative_to_cube.position.y, desired_pose_relative_to_cube.rotation.angle_z.degrees)
+
+	robot.say_text("This bit empty", False, True, 0.75, 0.25).wait_for_completed()
+	robot.move_lift(100)
+	time.sleep(1)
+	robot.say_text("YEET", False, True, 1.0, 1.0).wait_for_completed()
+	robot.move_lift(-50)
+	time.sleep(1)
 
 
 # Wrappers for existing Cozmo navigation functions
@@ -102,9 +111,9 @@ def cozmo_turn_in_place(robot, angle, speed):
 if __name__ == '__main__':
 
 	## For step 2
-	cozmo.run_program(find_relative_cube_pose)
+	# cozmo.run_program(find_relative_cube_pose)
 
 	## For step 3
-	# cozmo.run_program(move_relative_to_cube)
+	cozmo.run_program(move_relative_to_cube)
 
 
