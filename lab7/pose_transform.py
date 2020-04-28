@@ -14,7 +14,7 @@ import time
 import sys
 
 def get_relative_pose(object_pose, reference_frame_pose):
-	# TODO: negate reference pose due to SDK bug 
+	# TODO: negate reference pose due to SDK bug? 
 	return reference_frame_pose.define_pose_relative_this(object_pose)
 
 def find_relative_cube_pose(robot: cozmo.robot.Robot):
@@ -42,6 +42,8 @@ def move_relative_to_cube(robot: cozmo.robot.Robot):
 	robot.move_lift(-3)
 	robot.set_head_angle(degrees(0)).wait_for_completed()
 	cube = None
+	cube_pose = None
+	robot_pose = None
 
 	while cube is None:
 		try:
@@ -65,13 +67,14 @@ def move_relative_to_cube(robot: cozmo.robot.Robot):
 	# forklift and/or base movement.
 	# ####
 
-	desired_pose_relative_to_cube = get_relative_pose(cube_pose, robot_pose)
+	desired_pose_relative_to_cube = get_relative_pose(robot_pose, cube_pose)
 	cozmo_go_to_pose(robot, desired_pose_relative_to_cube.position.x, 
 		desired_pose_relative_to_cube.position.y, desired_pose_relative_to_cube.rotation.angle_z.degrees)
-
+	cozmo_drive_straight(robot, 50, 50)
 	robot.say_text("This bit empty", False, True, 0.75, 0.25).wait_for_completed()
 	robot.move_lift(100)
 	time.sleep(1)
+	cozmo_drive_straight(robot, 50, 50)
 	robot.say_text("YEET", False, True, 1.0, 1.0).wait_for_completed()
 	robot.move_lift(-50)
 	time.sleep(1)
