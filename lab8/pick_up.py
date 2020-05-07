@@ -1,8 +1,3 @@
-'''Drive And Turn
-
-Make Cozmo drive forwards, pick up an object, move it forwards, and drop it.
-'''
-
 import cozmo
 from cozmo.util import degrees, distance_mm, speed_mmps, Angle, Pose
 import time
